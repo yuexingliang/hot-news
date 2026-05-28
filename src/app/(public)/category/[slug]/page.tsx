@@ -40,7 +40,6 @@ export default async function CategoryPage({ params, searchParams }: { params: {
         {category.description && <p className="text-slate-400">{category.description}</p>}
       </header>
 
-      {/* @ts-expect-error Async Server Component */}
       <AdSlot code="top-banner" />
 
       <StaggerList className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

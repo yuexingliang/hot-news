@@ -45,7 +45,6 @@ export default async function HomePage() {
 
       {/* 顶部广告 */}
       <div className="max-w-7xl mx-auto px-4 mt-8">
-        {/* @ts-expect-error Async Server Component */}
         <AdSlot code="top-banner" />
       </div>
 
@@ -92,7 +91,6 @@ export default async function HomePage() {
 
       {/* 信息流广告 */}
       <div className="max-w-7xl mx-auto px-4">
-        {/* @ts-expect-error Async Server Component */}
         <AdSlot code="feed" />
       </div>
 
@@ -129,7 +127,6 @@ export default async function HomePage() {
             ))}
           </div>
           {/* 侧边栏广告 */}
-          {/* @ts-expect-error Async Server Component */}
           <AdSlot code="sidebar" />
         </aside>
       </section>

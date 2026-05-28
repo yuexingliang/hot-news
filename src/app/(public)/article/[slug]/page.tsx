@@ -139,7 +139,6 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         <ArticleContent contentType={a.contentType} content={a.content} />
 
         {/* 文章中段广告 */}
-        {/* @ts-expect-error Async Server Component */}
         <AdSlot code="in-article" />
 
         <ArticleActions
@@ -168,7 +167,6 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         </div>
 
         {/* 文末广告 */}
-        {/* @ts-expect-error Async Server Component */}
         <AdSlot code="footer" />
 
         <CommentBox articleId={a.id} />

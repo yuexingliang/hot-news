@@ -6,7 +6,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     <>
       <Header />
       <main className="min-h-screen">{children}</main>
-      {/* @ts-expect-error Async Server Component */}
       <Footer />
     </>
   );
