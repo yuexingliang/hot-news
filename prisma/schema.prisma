@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户：管理员 + 普通注册用户
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  avatar    String?
+  role      Role     @default(USER)
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles Article[]
+  comments Comment[]
+}
+
+enum Role {
+  USER
+  AUTHOR
+  ADMIN
+}
+
+// 分类（科技、娱乐、财经…）
+model Category {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String?
+  cover       String?
+  order       Int       @default(0)
+  articles    Article[]
+  createdAt   DateTime  @default(now())
+}
+
+// 标签
+model Tag {
+  id       String         @id @default(cuid())
+  slug     String         @unique
+  name     String
+  articles ArticleOnTag[]
+}
+
+model ArticleOnTag {
+  articleId String
+  tagId     String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+}
+
+// 文章
+model Article {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  title        String
+  summary      String?
+  cover        String?
+  // 内容形式：MARKDOWN / HTML / RICH
+  contentType  ContentType   @default(MARKDOWN)
+  content      String        @db.Text
+  // 当 contentType=HTML 时，原始用户输入（已经过 DOMPurify）
+  rawHtml      String?       @db.Text
+  status       ArticleStatus @default(DRAFT)
+  isPromotion  Boolean       @default(false) // 软文标识
+  isFeatured   Boolean       @default(false) // 首页推荐
+  isTop        Boolean       @default(false) // 置顶
+  views        Int           @default(0)
+  likes        Int           @default(0)
+  // SEO
+  seoTitle     String?
+  seoDesc      String?
+  seoKeywords  String?
+  // 定时发布
+  publishedAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  authorId   String
+  author     User      @relation(fields: [authorId], references: [id])
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  tags     ArticleOnTag[]
+  comments Comment[]
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@index([isPromotion])
+}
+
+enum ContentType {
+  MARKDOWN
+  HTML
+  RICH
+}
+
+enum ArticleStatus {
+  DRAFT
+  PENDING
+  PUBLISHED
+  ARCHIVED
+}
+
+// 评论
+model Comment {
+  id        String        @id @default(cuid())
+  content   String        @db.Text
+  status    CommentStatus @default(PENDING)
+  articleId String
+  article   Article       @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?         @relation(fields: [userId], references: [id])
+  // 游客评论
+  guestName  String?
+  guestEmail String?
+  parentId   String?
+  parent     Comment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies    Comment[] @relation("Replies")
+  createdAt  DateTime  @default(now())
+
+  @@index([articleId, status])
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// 广告位
+model AdSlot {
+  id          String   @id @default(cuid())
+  code        String   @unique // top-banner / sidebar / in-article / footer / feed
+  name        String
+  description String?
+  enabled     Boolean  @default(true)
+  // 内容（HTML 代码或图片+链接）
+  html        String?  @db.Text
+  imageUrl    String?
+  linkUrl     String?
+  startAt     DateTime?
+  endAt       DateTime?
+  // 统计
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 友情链接
+model FriendLink {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  logo      String?
+  order     Int      @default(0)
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// 站点设置（key-value）
+model Setting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+// 软文订单
+model PromotionOrder {
+  id          String   @id @default(cuid())
+  contactName String
+  contactInfo String   // 邮箱 / 微信
+  title       String
+  content     String   @db.Text
+  budget      Int?     // 预算（分）
+  status      OrderStatus @default(NEW)
+  articleId   String?
+  remark      String?
+  createdAt   DateTime @default(now())
+}
+
+enum OrderStatus {
+  NEW
+  PROCESSING
+  PUBLISHED
+  REJECTED
+  REFUNDED
+}
+
+// 举报
+model Report {
+  id         String   @id @default(cuid())
+  type       String   // article / comment
+  targetId   String
+  reason     String
+  contact    String?
+  handled    Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}

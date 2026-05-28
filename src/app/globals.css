@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body {
+  @apply bg-slate-950 text-slate-100 antialiased;
+  background-image:
+    radial-gradient(circle at 15% -5%, rgba(124,58,237,.18), transparent 40%),
+    radial-gradient(circle at 85% 0%, rgba(34,211,238,.15), transparent 45%),
+    radial-gradient(circle at 50% 100%, rgba(255,43,214,.10), transparent 55%);
+  background-attachment: fixed;
+}
+
+::selection { background: rgba(124,58,237,.4); color: #fff; }
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.25); }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* 渐变文字 */
+.text-gradient {
+  @apply bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan bg-clip-text text-transparent;
+  background-size: 200% 200%;
+  animation: gradient-x 8s ease infinite;
+}
+
+/* 玻璃拟态卡片 */
+.glass {
+  @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
+}
+
+.glass-strong {
+  @apply bg-white/10 backdrop-blur-xl border border-white/15 rounded-2xl;
+}
+
+/* 网格背景 */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* 霓虹按钮 */
+.btn-neon {
+  @apply relative inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full
+         font-medium text-white transition-all duration-300
+         bg-gradient-to-r from-neon-purple to-neon-cyan
+         hover:shadow-[0_0_30px_rgba(124,58,237,0.6)] active:scale-95;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full
+         border border-white/15 text-slate-200 hover:bg-white/5 transition;
+}
+
+/* 文章正文样式（prose 暗色） */
+.prose-article {
+  @apply prose prose-invert prose-lg max-w-none
+         prose-headings:scroll-mt-24
+         prose-a:text-brand-400 prose-a:no-underline hover:prose-a:underline
+         prose-img:rounded-xl prose-img:shadow-2xl
+         prose-pre:bg-slate-900/80 prose-pre:border prose-pre:border-white/5
+         prose-code:text-neon-cyan prose-code:before:content-none prose-code:after:content-none
+         prose-blockquote:border-neon-purple prose-blockquote:not-italic;
+}
+
+/* 用户 HTML 容器：允许内联样式 */
+.user-html { all: revert; }
+.user-html * { max-width: 100%; }
+
+/* hover 上浮 */
+.lift { transition: transform .3s ease, box-shadow .3s ease; }
+.lift:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -20px rgba(124,58,237,.5); }
+
+/* 闪光扫过 */
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.shine::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.18) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: shine 3s infinite;
+  pointer-events: none;
+}
+
+/* highlight.js 暗色主题最简版 */
+.hljs { background: transparent !important; }
