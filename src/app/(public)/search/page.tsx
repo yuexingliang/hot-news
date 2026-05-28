@@ -10,9 +10,9 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
         where: {
           status: 'PUBLISHED',
           OR: [
-            { title: { contains: q } },
-            { summary: { contains: q } },
-            { content: { contains: q } },
+            { title: { contains: q, mode: 'insensitive' } },
+            { summary: { contains: q, mode: 'insensitive' } },
+            { content: { contains: q, mode: 'insensitive' } },
           ],
         },
         orderBy: { publishedAt: 'desc' },

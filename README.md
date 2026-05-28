@@ -2,7 +2,7 @@
 
 **🌐 Language:** **English** (current) · [简体中文](./README.zh-CN.md)
 
-A cool, modern hybrid site for **hot news + sponsored content**. Built with **Next.js 14 + Prisma + MySQL + Tailwind + Framer Motion**.
+A cool, modern hybrid site for **hot news + sponsored content**. Built with **Next.js 14 + Prisma + PostgreSQL + Tailwind + Framer Motion**.
 
 ## ✨ Features
 
@@ -63,18 +63,19 @@ cp .env.example .env
 Edit `.env`:
 
 ```env
-DATABASE_URL="mysql://user:password@localhost:3306/hotnews"
+DATABASE_URL="postgresql://user:password@localhost:5432/hotnews?schema=public"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="$(openssl rand -base64 32)"   # generate a random string
 ADMIN_EMAIL="admin@example.com"
 ADMIN_PASSWORD="admin123456"
 ```
 
-> 💡 Don't have MySQL? Quickest options:
-> - macOS: `brew install mysql && brew services start mysql && mysql -uroot -e "CREATE DATABASE hotnews CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"`
-> - Docker: `docker run --name mysql -e MYSQL_ROOT_PASSWORD=pass -e MYSQL_DATABASE=hotnews -p 3306:3306 -d mysql:8`, then set `DATABASE_URL` to `mysql://root:pass@localhost:3306/hotnews`
+> 💡 Don't have PostgreSQL? Quickest options:
+> - macOS: `brew install postgresql@16 && brew services start postgresql@16 && createdb hotnews`
+> - Docker: `docker run --name postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_DB=hotnews -p 5432:5432 -d postgres:16`, then set `DATABASE_URL` to `postgresql://postgres:pass@localhost:5432/hotnews?schema=public`
+> - Free cloud: [Neon](https://neon.tech) (free 0.5GB) / [Supabase](https://supabase.com) / [Railway](https://railway.com) / [Vercel Postgres](https://vercel.com/storage/postgres)
 >
-> ℹ️ MySQL **8.0+** is recommended (uses `utf8mb4_0900_ai_ci`, fully supports emoji and case-insensitive search out of the box).
+> ℹ️ PostgreSQL **14+** recommended. Search uses Prisma's `mode: 'insensitive'` (translates to `ILIKE`) for case-insensitive matching.
 
 ### 3. Init database
 
@@ -164,8 +165,8 @@ After deploy, visit `https://your-domain/sitemap.xml` and submit it to Baidu Sea
 
 ## 🚢 Deploy
 
-- **Vercel**: easiest, free tier; pair with a hosted MySQL (PlanetScale, Aiven, Railway, or Alibaba/Tencent Cloud RDS)
-- **Self-hosted VPS**: `pm2 start "npm run start"`; Nginx reverse proxy + HTTPS; MySQL on the same box
+- **Vercel**: easiest, free tier; recommended databases: [Neon](https://neon.tech) / [Supabase](https://supabase.com) / [Vercel Postgres](https://vercel.com/storage/postgres) (Alibaba/Tencent Cloud RDS for PostgreSQL also works)
+- **Self-hosted VPS**: `pm2 start "npm run start"`; Nginx reverse proxy + HTTPS; PostgreSQL on the same box
 - **Docker**: write a Dockerfile (Next standalone + Prisma binary)
 
 ⚠️ Before going live:

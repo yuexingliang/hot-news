@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   const where: any = { status: 'PUBLISHED' };
   if (category) where.category = { slug: category };
   if (tag) where.tags = { some: { tag: { slug: tag } } };
-  if (q) where.OR = [{ title: { contains: q } }, { summary: { contains: q } }];
+  if (q) where.OR = [{ title: { contains: q, mode: 'insensitive' } }, { summary: { contains: q, mode: 'insensitive' } }];
   if (promotion === '1') where.isPromotion = true;
   if (promotion === '0') where.isPromotion = false;
 

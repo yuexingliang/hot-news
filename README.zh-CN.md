@@ -2,7 +2,7 @@
 
 **🌐 语言切换：** [English](./README.md) · **简体中文**（当前）
 
-一个炫酷的「资讯 + 软文」混合站。基于 **Next.js 14 + Prisma + MySQL + Tailwind + Framer Motion** 构建。
+一个炫酷的「资讯 + 软文」混合站。基于 **Next.js 14 + Prisma + PostgreSQL + Tailwind + Framer Motion** 构建。
 
 ## ✨ 特性
 
@@ -63,18 +63,19 @@ cp .env.example .env
 编辑 `.env`：
 
 ```env
-DATABASE_URL="mysql://user:password@localhost:3306/hotnews"
+DATABASE_URL="postgresql://user:password@localhost:5432/hotnews?schema=public"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="$(openssl rand -base64 32)"   # 必须填一个随机字符串
 ADMIN_EMAIL="admin@example.com"
 ADMIN_PASSWORD="admin123456"
 ```
 
-> 💡 没装 MySQL？最快办法：
-> - macOS：`brew install mysql && brew services start mysql && mysql -uroot -e "CREATE DATABASE hotnews CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"`
-> - Docker：`docker run --name mysql -e MYSQL_ROOT_PASSWORD=pass -e MYSQL_DATABASE=hotnews -p 3306:3306 -d mysql:8`，然后把 `DATABASE_URL` 改成 `mysql://root:pass@localhost:3306/hotnews`
+> 💡 没装 PostgreSQL？最快办法：
+> - macOS：`brew install postgresql@16 && brew services start postgresql@16 && createdb hotnews`
+> - Docker：`docker run --name postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_DB=hotnews -p 5432:5432 -d postgres:16`，然后把 `DATABASE_URL` 改成 `postgresql://postgres:pass@localhost:5432/hotnews?schema=public`
+> - 云端免费方案：[Neon](https://neon.tech)（永久免费 0.5GB） / [Supabase](https://supabase.com) / [Railway](https://railway.com) / [Vercel Postgres](https://vercel.com/storage/postgres)
 >
-> ℹ️ 推荐 MySQL **8.0+**（默认 `utf8mb4_0900_ai_ci`，完整支持 emoji，搜索默认不区分大小写）。
+> ℹ️ 推荐 PostgreSQL **14+**。本项目搜索使用 Prisma `mode: 'insensitive'`（即 `ILIKE`）实现大小写不敏感。
 
 ### 3. 初始化数据库
 
@@ -164,8 +165,8 @@ npm run db:seed      # 重新初始化种子数据
 
 ## 🚢 部署建议
 
-- **Vercel**：免费、最简单，需要外接数据库（PlanetScale、Aiven、Railway，或阿里云/腾讯云 RDS for MySQL）
-- **自建 VPS**：`pm2 start "npm run start"`；Nginx 做反代 + HTTPS；数据库装本机 MySQL
+- **Vercel**：免费、最简单，配套数据库推荐 [Neon](https://neon.tech) / [Supabase](https://supabase.com) / [Vercel Postgres](https://vercel.com/storage/postgres)（也支持阿里云/腾讯云 RDS for PostgreSQL）
+- **自建 VPS**：`pm2 start "npm run start"`；Nginx 做反代 + HTTPS；数据库装本机 PostgreSQL
 - **Docker**：自行编写 Dockerfile（Next standalone 模式 + Prisma binary）
 
 ⚠️ 上线前请：
