@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { sanitizeUserHtml } from '@/lib/sanitize';
+import { makeSlug } from '@/lib/utils';
 
 export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
   const a = await prisma.article.findUnique({
@@ -17,6 +18,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     await requireAdmin();
     const body = await req.json();
     const data: any = { ...body };
+    // slug 规范化：必须 ASCII；含中文/非法字符就走拼音重生成
+    if (typeof data.slug === 'string') {
+      const raw = data.slug.trim();
+      data.slug = raw && /^[a-z0-9-]+$/i.test(raw) ? raw : makeSlug(raw || data.title || '');
+    }
     if (data.contentType === 'HTML' || data.contentType === 'RICH') {
       data.rawHtml = data.content;
       data.content = sanitizeUserHtml(data.content);

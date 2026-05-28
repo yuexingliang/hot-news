@@ -1,13 +1,19 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import slugify from 'slugify';
+import { pinyin } from 'pinyin-pro';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 export function makeSlug(input: string) {
-  const base = slugify(input, { lower: true, strict: true, trim: true });
+  // 中文 → 拼音；英文/数字保持原样
+  const hasCJK = /[\u4e00-\u9fa5]/.test(input);
+  const text = hasCJK
+    ? pinyin(input, { toneType: 'none', type: 'string', nonZh: 'consecutive' })
+    : input;
+  const base = slugify(text, { lower: true, strict: true, trim: true });
   return base || `post-${Date.now()}`;
 }
 

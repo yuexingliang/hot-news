@@ -65,7 +65,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const data = articleSchema.parse(body);
 
-    const slug = data.slug?.trim() || makeSlug(data.title);
+    // slug 必须是 ASCII URL 安全字符；用户输入含中文/其他时走 makeSlug 重新生成
+    const rawSlug = data.slug?.trim();
+    const slug = rawSlug && /^[a-z0-9-]+$/i.test(rawSlug) ? rawSlug : makeSlug(rawSlug || data.title);
 
     let content = data.content;
     let rawHtml: string | undefined;

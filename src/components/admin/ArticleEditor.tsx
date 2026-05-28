@@ -73,6 +73,15 @@ export default function ArticleEditor({ initial, id }: { initial?: any; id?: str
   };
 
   const submit = async (overrideStatus?: string) => {
+    // 前端校验
+    if (!form.title.trim()) {
+      toast.error('请填写文章标题');
+      return;
+    }
+    if (!form.content.trim()) {
+      toast.error('请填写文章内容');
+      return;
+    }
     setSaving(true);
     const payload = { ...form, status: overrideStatus || form.status };
     const url = id ? `/api/articles/${id}` : '/api/articles';
@@ -84,8 +93,8 @@ export default function ArticleEditor({ initial, id }: { initial?: any; id?: str
       router.push('/admin/articles');
       router.refresh();
     } else {
-      const e = await res.json();
-      toast.error(e.error || '保存失败');
+      const e = await res.json().catch(() => ({}));
+      toast.error(humanizeError(e.error) || '保存失败');
     }
   };
 
@@ -95,8 +104,9 @@ export default function ArticleEditor({ initial, id }: { initial?: any; id?: str
         <input
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
-          placeholder="文章标题..."
-          className="w-full bg-transparent text-3xl font-bold outline-none placeholder:text-slate-600"
+          placeholder="文章标题（必填）..."
+          required
+          className="w-full bg-transparent text-3xl font-bold outline-none placeholder:text-slate-600 border-b-2 border-transparent focus:border-brand-400 transition pb-2"
         />
         <input
           value={form.slug}
@@ -250,6 +260,28 @@ export default function ArticleEditor({ initial, id }: { initial?: any; id?: str
       </aside>
     </div>
   );
+}
+
+// 把 Zod 报错转成人话
+function humanizeError(err: any): string {
+  if (!err) return '';
+  if (typeof err === 'string') {
+    try {
+      const parsed = JSON.parse(err);
+      if (Array.isArray(parsed)) {
+        const labels: Record<string, string> = {
+          title: '标题', content: '内容', slug: 'URL slug', summary: '摘要',
+          cover: '封面图', categoryId: '分类', contentType: '内容形式',
+        };
+        return parsed
+          .map((p) => `${labels[p.path?.[0]] || p.path?.[0] || '字段'}: ${p.message}`)
+          .join('；');
+      }
+    } catch {
+      return err;
+    }
+  }
+  return String(err);
 }
 
 // 极简 Markdown 预览
