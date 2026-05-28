@@ -2,7 +2,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
-import { sanitizeUserHtml } from '@/lib/sanitize';
 
 export default function ArticleContent({
   contentType,
@@ -12,9 +11,8 @@ export default function ArticleContent({
   content: string;
 }) {
   if (contentType === 'HTML' || contentType === 'RICH') {
-    // 服务端二次过滤一次，确保安全
-    const safe = sanitizeUserHtml(content);
-    return <div className="user-html prose-article" dangerouslySetInnerHTML={{ __html: safe }} />;
+    // content 入库时已经在 API 层过滤过（lib/sanitize.ts），此处直接渲染
+    return <div className="user-html prose-article" dangerouslySetInnerHTML={{ __html: content }} />;
   }
   return (
     <div className="prose-article">
